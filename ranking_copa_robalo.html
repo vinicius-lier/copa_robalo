@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Copa Robalo 2026 — Ranking</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Arial, sans-serif;
+    background: #f0f4f8;
+    min-height: 100vh;
+    padding: 24px 16px;
+    color: #1a1a2e;
+  }
+
+  .container { max-width: 860px; margin: 0 auto; }
+
+  /* HEADER */
+  .header {
+    background: linear-gradient(135deg, #1F4E79 0%, #2E75B6 100%);
+    border-radius: 16px 16px 0 0;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .trophy { font-size: 28px; }
+  .header h1 { color: white; font-size: 18px; font-weight: 600; line-height: 1.2; }
+  .header h1 span { display: block; font-size: 13px; font-weight: 400; opacity: 0.75; margin-top: 2px; }
+  .live-badge {
+    display: flex; align-items: center; gap: 6px;
+    background: rgba(255,255,255,0.15);
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 20px;
+    padding: 5px 12px;
+    color: white;
+    font-size: 12px;
+    font-weight: 500;
+  }
+  .live-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #4ade80;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.85)} }
+
+  /* CONTROLS */
+  .controls {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .control-group { display: flex; align-items: center; gap: 10px; }
+  .control-group label { font-size: 13px; color: #64748b; font-weight: 500; }
+  select {
+    font-size: 14px;
+    font-weight: 600;
+    color: #1F4E79;
+    padding: 7px 36px 7px 12px;
+    border: 1.5px solid #2E75B6;
+    border-radius: 8px;
+    background: #EBF3FB url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24'%3E%3Cpath fill='%231F4E79' d='M7 10l5 5 5-5z'/%3E%3C/svg%3E") no-repeat right 10px center;
+    appearance: none;
+    cursor: pointer;
+    min-width: 160px;
+  }
+  .stats { display: flex; gap: 10px; margin-left: auto; flex-wrap: wrap; }
+  .stat-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 8px 16px;
+    text-align: center;
+    min-width: 80px;
+  }
+  .stat-val { font-size: 20px; font-weight: 700; color: #1F4E79; line-height: 1.2; }
+  .stat-lbl { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+
+  /* ATUALIZAÇÃO */
+  .update-bar {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    padding: 7px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    color: #94a3b8;
+  }
+  .update-bar button {
+    background: none;
+    border: 1px solid #cbd5e1;
+    border-radius: 6px;
+    padding: 3px 10px;
+    font-size: 11px;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .update-bar button:hover { background: #e2e8f0; }
+
+  /* TABELA */
+  .table-wrap {
+    border: 1px solid #e2e8f0;
+    border-top: none;
+    border-radius: 0 0 16px 16px;
+    overflow: hidden;
+  }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead tr { background: #1F4E79; }
+  th {
+    color: white;
+    padding: 11px 14px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+  }
+  th:nth-child(2) { text-align: left; }
+  td {
+    padding: 11px 14px;
+    text-align: center;
+    border-bottom: 1px solid #f1f5f9;
+    color: #334155;
+  }
+  td:nth-child(2) { text-align: left; }
+  tr:last-child td { border-bottom: none; }
+
+  /* linhas top 3 */
+  tr.row-gold   td { background: #fffbeb; }
+  tr.row-silver td { background: #f9fafb; }
+  tr.row-bronze td { background: #fff7ed; }
+  tr.row-even   td { background: #f8fafc; }
+  tr.row-odd    td { background: white; }
+
+  /* badge de posição */
+  .pos {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 30px; height: 30px; border-radius: 50%;
+    font-weight: 700; font-size: 13px;
+  }
+  .pos-1 { background: #FFD700; color: #7a5900; }
+  .pos-2 { background: #C0C0C0; color: #444; }
+  .pos-3 { background: #CD7F32; color: #5c3200; }
+  .pos-n { background: #f1f5f9; color: #64748b; font-size: 12px; font-weight: 600; }
+
+  .nome { font-weight: 600; color: #1e293b; }
+  .total { font-weight: 700; color: #1F4E79; font-size: 15px; }
+  .aprv { font-weight: 600; color: #0F6E56; }
+  .etapa { color: #475569; }
+
+  /* estados */
+  .loading, .error, .empty {
+    text-align: center;
+    padding: 48px 24px;
+    color: #94a3b8;
+  }
+  .loading .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid #e2e8f0;
+    border-top-color: #2E75B6;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    margin: 0 auto 12px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .error { color: #dc2626; }
+  .error p { margin-top: 8px; font-size: 13px; color: #94a3b8; }
+
+  /* rodapé */
+  .footer {
+    text-align: center;
+    padding: 14px;
+    font-size: 12px;
+    color: #94a3b8;
+    margin-top: 6px;
+  }
+
+  @media (max-width: 600px) {
+    .stats { margin-left: 0; }
+    .header h1 { font-size: 15px; }
+    th, td { padding: 9px 8px; font-size: 12px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div class="header">
+    <div class="header-left">
+      <div class="trophy">🏆</div>
+      <h1>Copa Robalo 2026
+        <span>Ranking Oficial por Categoria</span>
+      </h1>
+    </div>
+    <div class="live-badge">
+      <div class="live-dot"></div>
+      Ao vivo
+    </div>
+  </div>
+
+  <div class="controls">
+    <div class="control-group">
+      <label for="catSelect">Categoria</label>
+      <select id="catSelect" onchange="trocarCategoria()">
+        <option>SENIOR A</option>
+        <option>SENIOR B</option>
+        <option>SENIOR C</option>
+        <option>SENIOR D</option>
+        <option>MASTER A</option>
+        <option>MASTER B</option>
+        <option>DAMAS</option>
+      </select>
+    </div>
+    <div class="stats">
+      <div class="stat-card">
+        <div class="stat-val" id="statAtletas">—</div>
+        <div class="stat-lbl">atletas</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="statLider">—</div>
+        <div class="stat-lbl">líder</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-val" id="statTop">—</div>
+        <div class="stat-lbl">melhor total</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="update-bar">
+    <span id="updateTime">Carregando dados...</span>
+    <button onclick="buscarDados()">↻ Atualizar</button>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr>
+          <th style="width:52px">Pos.</th>
+          <th>Atleta</th>
+          <th>Etapa 1</th>
+          <th>Etapa 2</th>
+          <th>Etapa 3</th>
+          <th>Etapa 4</th>
+          <th>Total</th>
+          <th>Aproveit.</th>
+        </tr>
+      </thead>
+      <tbody id="tbody">
+        <tr><td colspan="8">
+          <div class="loading">
+            <div class="spinner"></div>
+            Buscando dados da planilha...
+          </div>
+        </td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="footer">
+    Atualização automática a cada 30 segundos &nbsp;·&nbsp; Copa Robalo 2026
+  </div>
+
+</div>
+
+<script>
+const API_URL = "https://script.google.com/macros/s/AKfycbxfEeDYUx4uIipGkEALeMWy-Vm6HxTeqnTn4P_i8R_TS5Lj1MX2T37V-F1t_GZGvYSX/exec";
+const INTERVALO = 30000; // 30 segundos
+
+let dadosGlobais = null;
+let timer = null;
+
+async function buscarDados() {
+  try {
+    document.getElementById("updateTime").textContent = "Atualizando...";
+    const resp = await fetch(API_URL);
+    if (!resp.ok) throw new Error("Erro " + resp.status);
+    dadosGlobais = await resp.json();
+    renderRanking();
+    const agora = new Date().toLocaleTimeString("pt-BR");
+    document.getElementById("updateTime").textContent = "Última atualização: " + agora;
+  } catch (e) {
+    document.getElementById("updateTime").textContent = "Erro ao buscar dados — tentando novamente...";
+    document.getElementById("tbody").innerHTML = `
+      <tr><td colspan="8">
+        <div class="error">
+          Não foi possível conectar à planilha
+          <p>Verifique se o Apps Script está publicado como "Qualquer pessoa"</p>
+        </div>
+      </td></tr>`;
+  }
+}
+
+function trocarCategoria() {
+  if (dadosGlobais) renderRanking();
+}
+
+function renderRanking() {
+  const cat = document.getElementById("catSelect").value;
+  const atletas = dadosGlobais[cat] || [];
+  const tbody = document.getElementById("tbody");
+
+  if (!atletas.length) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty">Nenhum atleta cadastrado nesta categoria</div></td></tr>`;
+    document.getElementById("statAtletas").textContent = "0";
+    document.getElementById("statLider").textContent = "—";
+    document.getElementById("statTop").textContent = "—";
+    return;
+  }
+
+  document.getElementById("statAtletas").textContent = atletas.length;
+  document.getElementById("statLider").textContent = atletas[0].nome.split(" ")[0];
+  document.getElementById("statTop").textContent = atletas[0].total;
+
+  tbody.innerHTML = atletas.map((a, i) => {
+    const pos = i + 1;
+    const rowClass = pos===1 ? "row-gold" : pos===2 ? "row-silver" : pos===3 ? "row-bronze" : i%2===0 ? "row-even" : "row-odd";
+    const posClass = pos===1 ? "pos-1" : pos===2 ? "pos-2" : pos===3 ? "pos-3" : "pos-n";
+    const aprv = ((a.total / 200) * 100).toFixed(1);
+    return `
+      <tr class="${rowClass}">
+        <td><span class="pos ${posClass}">${pos}</span></td>
+        <td class="nome">${a.nome}</td>
+        <td class="etapa">${a.e1}</td>
+        <td class="etapa">${a.e2}</td>
+        <td class="etapa">${a.e3}</td>
+        <td class="etapa">${a.e4}</td>
+        <td class="total">${a.total}</td>
+        <td class="aprv">${aprv}%</td>
+      </tr>`;
+  }).join("");
+}
+
+// inicia e agenda atualização automática
+buscarDados();
+timer = setInterval(buscarDados, INTERVALO);
+</script>
+</body>
+</html>
